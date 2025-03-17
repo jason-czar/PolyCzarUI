@@ -1,5 +1,5 @@
 [build]
-  command = "./netlify-build.sh"
+  command = "pnpm build"
   publish = "dist"
   environment = { NODE_VERSION = "18" }
 
