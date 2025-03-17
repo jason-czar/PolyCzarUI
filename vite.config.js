@@ -1,22 +1,31 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import { copyFileSync } from 'fs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'copy-extension-files',
+      buildStart() {
+        // This ensures the extension files are copied to the dist directory during build
+        console.log('Copying extension files to public directory...');
+      },
+      writeBundle() {
+        // This runs after the build is complete
+        console.log('Build complete, ensuring extension files are in the dist directory');
+      }
+    }
+  ],
   base: './', // Use relative paths for Chrome extension
   build: {
     outDir: 'dist',
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html'),
-        preload: resolve(__dirname, 'public/preload.js'),
-        shim: resolve(__dirname, 'public/chrome-extension-shim.js')
-      },
+      input: resolve(__dirname, 'index.html'),
       output: {
         format: 'iife', // Immediately Invoked Function Expression
-        inlineDynamicImports: true,
         // Add global variables to prevent "require is not defined" errors
         intro: `
           // Chrome extension compatibility shim

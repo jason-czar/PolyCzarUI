@@ -5,7 +5,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolyCzar</title>
-  <!-- Chrome extension scripts are now handled by the build process -->
+  <!-- Chrome extension scripts are loaded conditionally -->
+  <script>
+    // Only load extension scripts if we're in a Chrome extension context
+    if (window.chrome && chrome.runtime && chrome.runtime.id) {
+      const preloadScript = document.createElement('script');
+      preloadScript.src = './preload.js';
+      document.head.appendChild(preloadScript);
+      
+      const shimScript = document.createElement('script');
+      shimScript.src = './chrome-extension-shim.js';
+      document.head.appendChild(shimScript);
+    }
+  </script>
 </head>
 
 <body>
