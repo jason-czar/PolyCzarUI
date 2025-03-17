@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "PolyCzar Options Chain",
+  "version": "1.0",
+  "description": "Display options chain for Polymarket events",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "sidePanel"
+  ],
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_icon": {
+      "16": "assets/icon/icon16.png",
+      "48": "assets/icon/icon48.png",
+      "128": "assets/icon/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon/icon16.png",
+    "48": "assets/icon/icon48.png",
+    "128": "assets/icon/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["chrome-extension-shim.js", "preload.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

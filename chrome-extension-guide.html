@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyCzar Chrome Extension Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #4A90E2;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .step {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .note {
+            background-color: #fffde7;
+            padding: 10px;
+            border-left: 4px solid #ffd600;
+            margin: 15px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>PolyCzar Chrome Extension Guide</h1>
+    
+    <div class="note">
+        <strong>Note:</strong> This guide will help you load your PolyCzar application as a Chrome extension.
+    </div>
+    
+    <div class="step">
+        <h2>Step 1: Create Icon Files</h2>
+        <p>Before loading the extension, you need to create icon files in the following sizes:</p>
+        <ul>
+            <li>16x16 pixels (icon16.png)</li>
+            <li>48x48 pixels (icon48.png)</li>
+            <li>128x128 pixels (icon128.png)</li>
+        </ul>
+        <p>Place these files in the <code>/public/assets/icon/</code> directory.</p>
+        <p>You can use any image editing software to create these icons with your PolyCzar branding.</p>
+    </div>
+    
+    <div class="step">
+        <h2>Step 2: Build Your Application</h2>
+        <p>Run the following command to build your React application:</p>
+        <pre>pnpm build</pre>
+        <p>This will create a production build in the <code>dist</code> directory.</p>
+    </div>
+    
+    <div class="step">
+        <h2>Step 3: Copy Manifest to Dist</h2>
+        <p>Make sure your manifest.json file is copied to the dist directory during the build process. If it's not automatically copied, run:</p>
+        <pre>cp public/manifest.json dist/</pre>
+        <p>Also ensure your icon files are copied:</p>
+        <pre>mkdir -p dist/assets/icon
+cp public/assets/icon/*.png dist/assets/icon/</pre>
+    </div>
+    
+    <div class="step">
+        <h2>Step 4: Load the Extension in Chrome</h2>
+        <ol>
+            <li>Open Chrome and navigate to <code>chrome://extensions</code></li>
+            <li>Enable "Developer mode" by toggling the switch in the top-right corner</li>
+            <li>Click "Load unpacked" button</li>
+            <li>Select the <code>dist</code> directory of your PolyCzar application</li>
+        </ol>
+        <p>Your PolyCzar extension should now appear in the extensions list and be available from the Chrome toolbar.</p>
+    </div>
+    
+    <div class="step">
+        <h2>Step 5: Test Your Extension</h2>
+        <p>Click on the PolyCzar icon in your Chrome toolbar to open the extension popup.</p>
+        <p>The extension should display your React application in the popup window.</p>
+    </div>
+    
+    <div class="step">
+        <h2>Troubleshooting</h2>
+        <h3>Extension Not Loading</h3>
+        <p>If your extension doesn't load properly:</p>
+        <ul>
+            <li>Check Chrome's developer console for errors</li>
+            <li>Ensure all paths in manifest.json are correct</li>
+            <li>Make sure your build process is correctly copying all necessary files to the dist directory</li>
+        </ul>
+        
+        <h3>Content Security Policy Issues</h3>
+        <p>If you encounter CSP (Content Security Policy) issues, you may need to modify your manifest.json and/or adjust your application's code to comply with Chrome's extension security policies.</p>
+    </div>
+    
+    <div class="step">
+        <h2>Publishing Your Extension</h2>
+        <p>When you're ready to publish your extension to the Chrome Web Store:</p>
+        <ol>
+            <li>Create a ZIP file of your dist directory</li>
+            <li>Create a developer account on the Chrome Web Store</li>
+            <li>Follow the submission process on the Chrome Web Store Developer Dashboard</li>
+        </ol>
+        <p>For more information, visit the <a href="https://developer.chrome.com/docs/webstore/publish" target="_blank">Chrome Web Store publishing documentation</a>.</p>
+    </div>
+    
+    <div class="note">
+        <p><strong>Remember:</strong> Chrome extensions have certain limitations and security restrictions that may affect how your application functions. You may need to make adjustments to your code to ensure it works properly as an extension.</p>
+    </div>
+</body>
+</html>

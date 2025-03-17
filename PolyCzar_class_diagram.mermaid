@@ -1,0 +1,106 @@
+classDiagram
+    class OptionsPricingEngine {
+        -pricingModel: PricingModel
+        -marketMonitor: MarketMonitor
+        -historicalDataService: HistoricalDataService
+        -volatilityService: VolatilityService
+        +initialize()
+        +getPriceForOption(optionDetails) OptionPrice
+        +updateMarketData(marketId)
+        +subscribeToUpdates(callback) unsubscribe
+    }
+
+    class PricingModel {
+        <<interface>>
+        +calculatePrice(params) OptionPrice
+    }
+
+    class BlackScholesBinaryModel {
+        +calculatePrice(params) OptionPrice
+        -normalCDF(x) Number
+        -normalPDF(x) Number
+        -calculateD1D2(params) Object
+    }
+
+    class BinomialModel {
+        +calculatePrice(params) OptionPrice
+        -buildTree(steps, params) Array
+    }
+
+    class OptionPrice {
+        +midPrice: Number
+        +bidPrice: Number
+        +askPrice: Number
+        +timestamp: Date
+        +delta: Number
+        +gamma: Number
+        +theta: Number
+        +vega: Number
+    }
+
+    class MarketMonitor {
+        -markets: Map
+        -pollingIntervals: Map
+        -listeners: Array
+        +startMonitoring(marketId, interval)
+        +stopMonitoring(marketId)
+        +addListener(callback) unsubscribe
+        -fetchAndUpdate(marketId)
+        -notifyListeners(marketId, data, updateType)
+    }
+
+    class VolatilityService {
+        -historicalDataService: HistoricalDataService
+        -volatilityCache: Map
+        +calculateVolatility(marketId, method) Number
+        +getDynamicVolatility(marketId, timeToExpiry) Number
+        +updateVolatilityEstimate(marketId)
+        -calculateHistoricalVolatility(data) Number
+        -applyTermStructure(baseVol, timeToExpiry) Number
+    }
+
+    class HistoricalDataService {
+        -dbName: String
+        -db: IDBDatabase
+        +initialize()
+        +storeDataPoint(marketId, dataPoint)
+        +getHistoricalData(marketId, days) Promise~Array~
+        +clearOldData(olderThanDays)
+        -openDatabase() Promise~IDBDatabase~
+    }
+
+    class AMM {
+        -liquidityPools: Map
+        -pricingEngine: OptionsPricingEngine
+        +initialize()
+        +getPrice(optionId, optionDetails) OptionPrice
+        +addLiquidity(optionId, amount)
+        +removeLiquidity(optionId, amount)
+        +executeTrade(optionId, direction, amount) TradeResult
+        -initializeLiquidityPool(optionId, initialPrice)
+        -calculateLiquidityFactor(pool) Number
+    }
+
+    class PolymarketService {
+        +getMarketData(marketId) Promise~MarketData~
+        +getHistoricalPrices(marketId, days) Promise~Array~
+        -handleAPIError(error)
+    }
+
+    class RiskManager {
+        -amm: AMM
+        +calculatePositionLimits(optionId) Number
+        +estimateImpermanentLoss(marketId, probChange) Number
+        +evaluateMarketRisk(marketId) RiskMetrics
+    }
+
+    PricingModel <|.. BlackScholesBinaryModel
+    PricingModel <|.. BinomialModel
+    OptionsPricingEngine --> PricingModel
+    OptionsPricingEngine --> MarketMonitor
+    OptionsPricingEngine --> HistoricalDataService
+    OptionsPricingEngine --> VolatilityService
+    VolatilityService --> HistoricalDataService
+    AMM --> OptionsPricingEngine
+    MarketMonitor --> PolymarketService
+    RiskManager --> AMM

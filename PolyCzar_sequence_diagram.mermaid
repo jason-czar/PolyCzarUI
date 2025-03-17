@@ -1,0 +1,69 @@
+sequenceDiagram
+    participant UI as User Interface
+    participant AMM as AMM
+    participant OPE as OptionsPricingEngine
+    participant BSM as BlackScholesBinaryModel
+    participant MM as MarketMonitor
+    participant VS as VolatilityService
+    participant HDS as HistoricalDataService
+    participant PMS as PolymarketService
+    
+    %% Initialization Flow
+    UI->>OPE: initialize()
+    OPE->>HDS: initialize()
+    HDS-->>OPE: initialized
+    OPE->>MM: initialize()
+    MM-->>OPE: initialized
+    OPE->>VS: initialize()
+    VS->>HDS: getHistoricalData(marketId)
+    HDS-->>VS: historicalData
+    VS-->>OPE: initialized
+    OPE-->>UI: ready
+    
+    %% Market Data Loading Flow
+    UI->>PMS: getMarketData(marketId)
+    PMS-->>UI: marketData
+    UI->>MM: startMonitoring(marketId)
+    MM->>PMS: getMarketData(marketId)
+    PMS-->>MM: marketData
+    MM->>HDS: storeDataPoint(marketId, dataPoint)
+    MM->>OPE: notifyMarketUpdate(marketId, marketData)
+    OPE->>VS: updateVolatilityEstimate(marketId)
+    VS->>HDS: getHistoricalData(marketId)
+    HDS-->>VS: historicalData
+    VS-->>OPE: updated
+    
+    %% Option Price Calculation Flow
+    UI->>AMM: getPrice(optionId, optionDetails)
+    AMM->>OPE: getPriceForOption(optionDetails)
+    OPE->>VS: getDynamicVolatility(marketId, timeToExpiry)
+    VS-->>OPE: volatility
+    OPE->>BSM: calculatePrice(params)
+    BSM-->>OPE: optionPrice
+    OPE-->>AMM: optionPrice
+    AMM-->>UI: bidPrice, askPrice
+    
+    %% Real-time Updates Flow
+    MM->>PMS: getMarketData(marketId)
+    PMS-->>MM: updatedMarketData
+    MM->>OPE: notifyMarketUpdate(marketId, marketData)
+    OPE->>UI: notifyPriceUpdates()
+    UI->>AMM: getPrice(optionId, optionDetails)
+    AMM->>OPE: getPriceForOption(optionDetails)
+    OPE->>VS: getDynamicVolatility(marketId, timeToExpiry)
+    VS-->>OPE: volatility
+    OPE->>BSM: calculatePrice(params)
+    BSM-->>OPE: optionPrice
+    OPE-->>AMM: optionPrice
+    AMM-->>UI: bidPrice, askPrice
+    
+    %% Trade Execution Flow
+    UI->>AMM: executeTrade(optionId, direction, amount)
+    AMM->>OPE: getPriceForOption(optionDetails)
+    OPE->>BSM: calculatePrice(params)
+    BSM-->>OPE: optionPrice
+    OPE-->>AMM: optionPrice
+    AMM-->>UI: tradeResult
+    AMM->>MM: notifyTrade(marketId, tradeDetails)
+    MM->>OPE: notifyMarketUpdate(marketId, updateType='trade')
+    OPE->>UI: notifyPriceUpdates()
