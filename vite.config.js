@@ -9,6 +9,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        preload: resolve(__dirname, 'public/preload.js'),
+        shim: resolve(__dirname, 'public/chrome-extension-shim.js')
+      },
       output: {
         format: 'iife', // Immediately Invoked Function Expression
         inlineDynamicImports: true,
